@@ -7,16 +7,11 @@ class Bloc(pygame.sprite.Sprite):
         self.image = pygame.Surface((width, height))
         self.image.fill(pygame.Color(255, 255, 0, 0))
         self.rect = pygame.Rect((x, y), (width, height))
-#    def __init__(self, *groups):
-#        super(Bloc, self).__init__(*groups)
-#        self.image = pygame.Surface((1600, 600-436))
-#        self.image.fill(pygame.Color(255, 255, 0, 0))
-#        self.rect = pygame.Rect((0, 436), self.image.get_size())
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, *groups):
-        super(Player, self).__init__(*groups)
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
         self.sheet = pygame.image.load('Imatges/Spritesheet.png')
         self.animacio = []
         for x in range(0, 360, 72):
@@ -75,15 +70,21 @@ class Player(pygame.sprite.Sprite):
 
 
 class Game (object):
-    def main(self, screen):
+    def main(self, pantalla):
+        self.alçada = pantalla.get_width()
+        self.amplada = pantalla.get_height()
+
         clock = pygame.time.Clock()
+
+        # Creem dos grups d'sprites
         self.sprites = pygame.sprite.Group()
         self.blocs = pygame.sprite.Group()
+
         self.surt = False
         self.fons = pygame.image.load('Imatges/Fons.png')
-        self.player = Player(self.sprites)
+        self.player = Player()
+        self.player.add(self.sprites)
         self.playerG = pygame.sprite.GroupSingle(self.player)
-#        self.terra = Bloc(self.blocs)
         self.terra = Bloc(1600, 600-436, 0, 436, self.blocs)
         Bloc(80, 20, 200, 300, self.blocs)
         Bloc(80, 20, 300, 200, self.blocs)
@@ -92,7 +93,7 @@ class Game (object):
             dt = clock.tick(30)
             self.gestiona_esdeveniments()
             self.update(dt/1000)
-            self.draw(screen)
+            self.draw(pantalla)
 
     def gestiona_esdeveniments(self):
         for event in pygame.event.get():
@@ -104,7 +105,9 @@ class Game (object):
                 self.gestiona_alliberament(event)
 
     def gestiona_pressió(self, event):
-        if event.key == pygame.K_RIGHT:
+        if event.key == pygame.K_ESCAPE:
+            self.surt = True
+        elif event.key == pygame.K_RIGHT:
             self.player.right = True
         elif event.key == pygame.K_LEFT:
             self.player.left = True
@@ -122,14 +125,17 @@ class Game (object):
     def update(self, dt):
         self.sprites.update(dt, self)
 
-    def draw(self, screen):
-        screen.blit(self.fons, (0, 0))
-        self.blocs.draw(screen)
-        self.sprites.draw(screen)
+    def draw(self, pantalla):
+        pantalla.blit(self.fons, (0, 0))
+        self.blocs.draw(pantalla)
+        self.sprites.draw(pantalla)
         pygame.display.flip()
 
 
 if __name__ == '__main__':
     pygame.init()
-    screen = pygame.display.set_mode((800, 600))
-    Game().main(screen)
+    amplada = 800
+    alçada = 600
+    pantalla = pygame.display.set_mode((amplada, alçada))
+    Game().main(pantalla)
+    pygame.quit()
