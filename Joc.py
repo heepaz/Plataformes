@@ -50,13 +50,12 @@ class Player(pygame.sprite.Sprite):
                 self.animacio[self.current_image], True, False)
             self.rect.x -= self.vx * dt
 
+        self.rect.y += self.vy * dt + 0.5 * self.ay * dt * dt
+        self.vy += self.ay * dt
         top_terra = self.tocant_terra(game)
         if top_terra and top_terra > game.player.rect.top and self.vy >= 0:
             game.player.rect.bottom = top_terra + 1
             self.vy = 0
-        else:
-            self.rect.y += self.vy * dt + 0.5 * self.ay * dt * dt
-            self.vy += self.ay * dt
 
     def tocant_terra(self, game):
         dict = pygame.sprite.groupcollide(
